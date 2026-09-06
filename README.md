@@ -23,9 +23,7 @@ There are five flags:
   (nginx, php, mysql) and a static Docker client at build time.
 - Works on both amd64 and arm64 hosts.
 
-## Deployment options
-
-### 1. Build the image from this repository (recommended)
+## Running the challenge
 
 ```bash
 git clone https://github.com/jesse-quinn/CTF-1.git
@@ -49,23 +47,6 @@ Note: if you use `-d`, you will not see the inner Compose deployment progress.
 If some of those host ports are already in use on your machine, remap the left
 side of each `-p` flag (for example `-p 18080:8080 -p 2222:22 -p 2323:23
 -p 33060:3306`); the challenge itself is unaffected.
-
-### 2. TryHackMe
-
-The original challenge is published as a TryHackMe room:
-<https://tryhackme.com/jr/docker-ctf>. The room tracks the upstream project and
-may lag the improvements in this repository.
-
-### 3. VirtualBox image
-
-An OVA image may be published in the releases section. Import it, set the network
-adapter to Bridged Adapter, start the VM, and access the challenge on the
-assigned IP address.
-
-## Flag verification site
-
-A companion flag verification site exists upstream:
-<https://github.com/ilolm/ctf-flag-verification-site.git>.
 
 ## Rules
 
