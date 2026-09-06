@@ -1,97 +1,76 @@
 # Docker-in-Docker CTF
 
-🎯 **Docker-in-Docker CTF** is a Capture The Flag challenge that can be deployed using Docker or as a VirtualBox image. Follow the instructions below to set up and start playing!
+Docker-in-Docker CTF is a Capture The Flag challenge that runs as a single
+privileged Docker container. Inside it, an outer host runs its own Docker engine
+and deploys a small web stack (nginx, php-fpm, mysql) with Docker Compose. The
+goal is to work through the web application into the inner containers, escalate
+privileges, and finally break back out to the outer host.
 
----
+There are five flags:
 
-## 🚀 Deployment Options
+| Flag file | Location | Prefix |
+|---|---|---|
+| user.txt | outer host, user `king` | `MAIN_FLAG{...}` |
+| gleb.txt | web container, user `gleb` | `FLAG{...}` |
+| rebeca.txt | web container, user `rebeca` | `FLAG{...}` |
+| docker-root.txt | web container, `root` | `DOCKER_FLAG{...}` |
+| root.txt | outer host, `root` | `MAIN_FLAG{...}` |
 
-### 1. 🎓 TryHackMe
+## Requirements
 
-Complete this CTF on TryHackMe:
+- Docker Engine that can run a privileged container (Docker Desktop works).
+- Internet access on the first run: the inner stack pulls its base images
+  (nginx, php, mysql) and a static Docker client at build time.
+- Works on both amd64 and arm64 hosts.
 
-- Join the room [here](https://tryhackme.com/jr/docker-ctf).
-- Launch the provided machine and start solving the challenge.
+## Deployment options
 
----
-
-### 2. 🐳 Prebuilt Docker Image *(Recommended)*
-
-1. Pull docker-ctf image from Docker-Hub
+### 1. Build the image from this repository (recommended)
 
 ```bash
-sudo docker image pull ilolm/docker-ctf
+git clone https://github.com/jesse-quinn/CTF-1.git
+cd CTF-1
+sudo docker image build -t docker-ctf:latest .
+sudo docker container run -it --rm --privileged \
+  --hostname docker-ctf --name docker-ctf \
+  -p 8080:8080 -p 22:22 -p 23:23 -p 3306:3306 \
+  docker-ctf:latest
 ```
 
-2. Then, run the Docker container with the following command:
+Then wait for the inner Docker Compose stack to finish deploying. The web
+application is served on port 8080.
 
-```bash
-sudo docker container run -it --rm --privileged --hostname docker-ctf --name docker-ctf -p 8080:8080 -p 22:22 -p 23:23 -p 3306:3306 ilolm/docker-ctf
-```
+Note: if you use `-d`, you will not see the inner Compose deployment progress.
 
-3. After that wait for internal docker compose to be deployed.
+If some of those host ports are already in use on your machine, remap the left
+side of each `-p` flag (for example `-p 18080:8080 -p 2222:22 -p 2323:23
+-p 33060:3306`); the challenge itself is unaffected.
 
-*Note: If you use -d option(you will not see the docker compose deployment progress)*
+### 2. TryHackMe
 
----
+The original challenge is published as a TryHackMe room:
+<https://tryhackme.com/jr/docker-ctf>. The room tracks the upstream project and
+may lag the improvements in this repository.
 
-### 3. 🔧 Build the Docker Image manually
+### 3. VirtualBox image
 
-If you prefer to build the Docker image yourself, follow these steps:
+An OVA image may be published in the releases section. Import it, set the network
+adapter to Bridged Adapter, start the VM, and access the challenge on the
+assigned IP address.
 
-1. Clone the repository:
+## Flag verification site
 
-    ```bash
-    git clone https://github.com/ilolm/docker-CTF.git
-    cd docker-CTF
-    ```
+A companion flag verification site exists upstream:
+<https://github.com/ilolm/ctf-flag-verification-site.git>.
 
-2. Build the Docker image:
+## Rules
 
-    ```bash
-    sudo docker image build -t docker-ctf:latest .
-    ```
+- Do not read the flag files or the solution notes during setup. The challenge
+  is finding them through gameplay.
+- The intended solution path is documented, for maintainers, in
+  `docs/WALKTHROUGH.md`. It is a spoiler; do not open it if you want to play.
 
-3. Run the Docker container:
+## Credits
 
-    ```bash
-    sudo docker container run -it --rm --privileged --hostname docker-ctf --name docker-ctf -p 8080:8080 -p 22:22 -p 23:23 -p 3306:3306 docker-ctf
-    ```
-
-4. After that wait for internal docker compose to be deployed.
-
-*Note: If you use -d option(you will not see the docker compose deployment progress)*
-
-
----
-
-### 4. 💻 VirtualBox Image
-
-Alternatively, you can deploy the CTF using a VirtualBox image:
-
-1. Download the VirtualBox image from the [releases section](https://github.com/ilolm/docker-CTF/releases).
-
-2. Open VirtualBox, and either create a new VM or import the downloaded OVA file.
-
-3. Set the network adapter to **Bridged Adapter** mode to ensure the VM can be accessed on the same network as your host machine.
-
-4. Start the VM and note the assigned IP address.
-
-5. Access the CTF challenge via the assigned IP address.
-
----
-
-## 🔗 CTF Flag Verification Site
-
-For verifying flags, use the [CTF Flag Verification Site](https://github.com/ilolm/ctf-flag-verification-site.git). This site is specifically designed to work seamlessly with this CTF challenge.
-
----
-
-## 📜 Important Rules
-
-- **🚫 No Peeking:** **Do not attempt to access or open the flags during the Docker build process.** The real challenge is finding them through gameplay. 💡
-- **🎉 Have Fun:** This CTF is designed to challenge your skills and knowledge, so enjoy the process and learn as you go!
-
----
-
-Happy hacking! 🚀
+This project is a maintained fork of the original Docker-in-Docker CTF by ilolm
+(<https://github.com/ilolm/docker-CTF>). See `CHANGELOG.md` for what changed.
