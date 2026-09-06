@@ -1,0 +1,9 @@
+.git
+.gitignore
+*.ova
+docker-web/mysql/
+docker-web/html/logs/
+README.md
+CHANGELOG.md
+docs/
+LICENSE

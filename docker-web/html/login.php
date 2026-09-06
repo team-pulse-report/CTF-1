@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    $conn = new mysqli('mysql', 'root', 'ZXGPK9tk7s0RPqp3Q8d1Hy5MZRw=', 'webchik');
+    $conn = new mysqli('mysql', 'root', 'gJUiQhNDpDcM8ZQJppJ5Fjx1', 'webchik');
 
     if ($conn->connect_error) {
         die("Waiting for DB to initialize.");
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['username'] = $username;
         $logMessage .= "Status: SUCCESS\n";
         file_put_contents($logFile, $logMessage, FILE_APPEND);
-        $message = "Hi $username, I remind you about our new Database credentials:\nroot:ZXGPK9tk7s0RPqp3Q8d1Hy5MZRw=";
+        $message = "Hi $username, I remind you about our new Database credentials:\nroot:gJUiQhNDpDcM8ZQJppJ5Fjx1";
         $messageClass = 'success';
     } else {
         $logMessage .= "Status: FAILURE\n";
