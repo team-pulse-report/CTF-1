@@ -4,24 +4,20 @@ FROM ubuntu:24.04
 RUN apt-get update \
     && apt-get install -y docker.io docker-compose-v2 openssh-server nano \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* && \
-
-    echo "Setup docker env + ssh env" \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "Setup docker env + ssh env" \
     && mkdir -p /var/lib/docker /run/sshd \
     && sed -i "s/#PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config \
     && sed -i "s/#PasswordAuthentication.*/PasswordAuthentication yes/" /etc/ssh/sshd_config \
-    && ssh-keygen -A && \
-
-    echo "Adding user king" \
+    && ssh-keygen -A \
+    && echo "Adding user king" \
     && useradd -m king \
     && echo -n "king:Password12345" | chpasswd \
     && chmod 0700 /home/king \
-    && userdel ubuntu && \
-
-    echo "Bash configuring" \
-    && sed -i 's#/bin/sh#/bin/bash#' /etc/passwd && \
-
-    echo "Linking .bash_history to /dev/null" \
+    && userdel ubuntu \
+    && echo "Bash configuring" \
+    && sed -i 's#/bin/sh#/bin/bash#' /etc/passwd \
+    && echo "Linking .bash_history to /dev/null" \
     && ln -sf /dev/null /root/.bash_history \
     && ln -sf /dev/null /home/king/.bash_history
 
@@ -32,15 +28,13 @@ COPY ./docker-web /home/king/docker-web
 
 RUN echo "Permissions for flags" \
     && chown root:root /root/root.txt && chmod 0400 /root/root.txt \
-    && chown king:king /home/king/user.txt && chmod 0400 /home/king/user.txt && \
-
-    echo "Permissions for main files" \
+    && chown king:king /home/king/user.txt && chmod 0400 /home/king/user.txt \
+    && echo "Permissions for main files" \
     && chmod 0755 /home/king/docker-web && chown -R root:root /home/king/docker-web \
     && chmod 0700 /home/king/docker-web/.ssh.tar \
     && chmod 0400 -R /home/king/docker-web/flags \
     && chmod 0640 /home/king/docker-web/sudoers \
     && mkdir -p /home/king/docker-web/html/logs && chmod 0777 /home/king/docker-web/html/logs
-
 
 # Store the inner Docker engine's data on a volume so the nested engine does not
 # run overlay-on-overlay (matches the official docker:dind image). Without this,
