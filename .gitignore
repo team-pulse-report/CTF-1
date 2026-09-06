@@ -1,2 +1,6 @@
 docker-ctf_24.04.ova
 docker-ctf_20.04.ova
+
+# runtime MySQL data dir (created by the inner stack)
+docker-web/mysql/
+docker-web/html/logs/

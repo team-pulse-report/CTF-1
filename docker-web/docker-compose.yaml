@@ -1,4 +1,3 @@
-version: "3.8"
 services:
     web:
         build:
@@ -17,6 +16,10 @@ services:
             - mysql
         volumes:
             - ./html/logs:/home/gleb/html/logs
+            # Misconfiguration: the host Docker socket is exposed inside the web
+            # container. Root inside this container can therefore control the
+            # outer Docker engine and break out to the main host.
+            - /var/run/docker.sock:/var/run/docker.sock
 
     php-fpm:
         build:
@@ -24,20 +27,26 @@ services:
             dockerfile: php-fpm.Dockerfile
         container_name: php-fpm
         restart: unless-stopped
+        dns:
+            - 1.1.1.1
+            - 1.0.0.1
         depends_on:
             - mysql
         volumes:
             - ./html/logs:/var/www/html/logs
 
     mysql:
-        image: mysql:8.0.40-debian
+        image: mysql:8.4
         container_name: mysql
         restart: unless-stopped
+        dns:
+            - 1.1.1.1
+            - 1.0.0.1
         ports:
             - "3306:3306"
         environment:
             MYSQL_DATABASE: webchik
-            MYSQL_ROOT_PASSWORD: "ZXGPK9tk7s0RPqp3Q8d1Hy5MZRw="
+            MYSQL_ROOT_PASSWORD: "gJUiQhNDpDcM8ZQJppJ5Fjx1"
         volumes:
             - ./mysql:/var/lib/mysql
             - ./initdb:/docker-entrypoint-initdb.d

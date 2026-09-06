@@ -30,9 +30,6 @@ COPY ./main_flags/root.txt /root/root.txt
 COPY ./main_flags/user.txt /home/king/user.txt
 COPY ./docker-web /home/king/docker-web
 
-# Copying php docker image
-COPY ["./docker-images/php-fpm.tar", "/docker-images/"]
-
 RUN echo "Permissions for flags" \
     && chown root:root /root/root.txt && chmod 0400 /root/root.txt \
     && chown king:king /home/king/user.txt && chmod 0400 /home/king/user.txt && \
@@ -44,6 +41,12 @@ RUN echo "Permissions for flags" \
     && chmod 0640 /home/king/docker-web/sudoers \
     && mkdir -p /home/king/docker-web/html/logs && chmod 0777 /home/king/docker-web/html/logs
 
+
+# Store the inner Docker engine's data on a volume so the nested engine does not
+# run overlay-on-overlay (matches the official docker:dind image). Without this,
+# inner image builds fail on hosts whose /var/lib/docker is itself an overlay
+# filesystem (for example Docker Desktop).
+VOLUME /var/lib/docker
 
 EXPOSE 22 23 3306 8080
 
