@@ -30,12 +30,16 @@ There are five flags:
 ```bash
 git clone https://github.com/jesse-quinn/CTF-1.git
 cd CTF-1
-sudo docker image build -t docker-ctf:latest .
-sudo docker container run -it --rm --privileged \
+docker image build -t docker-ctf:latest .
+docker container run -it --rm --privileged \
   --hostname docker-ctf --name docker-ctf \
   -p 8080:8080 -p 22:22 -p 23:23 -p 3306:3306 \
   docker-ctf:latest
 ```
+
+Run the build and run from inside the cloned `CTF-1` directory. On Docker
+Desktop (macOS, Windows) do not use `sudo`; on a Linux host, prefix both
+commands with `sudo` or add your user to the `docker` group.
 
 Then wait for the inner Docker Compose stack to finish deploying. The web
 application is served on port 8080.
