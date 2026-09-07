@@ -41,14 +41,24 @@ SSH, 3306 MySQL.
 - `ssh gleb@TARGET -p 23` (the web container's SSH is published on 23).
 - `cat ~/gleb.txt` gives the first `FLAG{...}`.
 
-## Stage 5 - gleb to rebeca (SUID find)
+## Stage 5 - gleb to rebeca (SUID find, then rebeca's SSH key)
 
 - `/usr/bin/find` is SUID and owned by `rebeca`.
-- `find . -exec /bin/sh -p \;` gives a shell as `rebeca` (GTFOBins).
+- `find . -exec /bin/sh -p \;` gives a shell with the effective UID of `rebeca`
+  (GTFOBins). The real UID stays `gleb`; that is enough to read `rebeca`'s files
+  but not to satisfy `sudo`, which authorizes by real UID.
 - `cat /home/rebeca/rebeca.txt` gives the second `FLAG{...}`.
+- Use the same euid=rebeca shell to read `rebeca`'s SSH private key:
+  `cat /home/rebeca/.ssh/id_rsa`. Save it as `id_rsa` and `chmod 600 id_rsa`.
 
-## Stage 6 - rebeca to container root (sudo nano)
+## Stage 6 - rebeca login to container root (SSH key, then sudo nano)
 
+- `rebeca`'s account password is randomized at build time, so the SSH key is the
+  only way to a real `rebeca` login. The key matches
+  `/home/rebeca/.ssh/authorized_keys`, so from the gleb shell inside the web
+  container: `ssh -i id_rsa rebeca@localhost` (the container's own sshd on port
+  22; externally it is published on 23). This gives a session whose real UID is
+  `rebeca`, which is what `sudo` checks.
 - `sudo -l` shows `rebeca` may run `/usr/bin/nano` with NOPASSWD.
 - `sudo nano`, then `^R^X` and run `reset; sh 1>&0 2>&0` (GTFOBins) for a root
   shell in the web container.
@@ -70,7 +80,8 @@ SSH, 3306 MySQL.
 
 - `bippa` in `users` cracks to `green` but maps to no system account; it is a
   red herring.
-- `rebeca`'s SSH private key under `~/.ssh` is self-referential and opens nothing
-  new; `rebeca` is reached through SUID `find`, not SSH.
+- `rebeca`'s SSH private key under `~/.ssh` is load-bearing, not a red herring:
+  the SUID-`find` shell only sets euid=rebeca, so the key (read via that shell)
+  is what buys a real `rebeca` login and lets `sudo` authorize the escalation.
 - The root crontab writing to `/dev/pts` only prints the `demotivation` lines; it
   is flavor, not a vector.

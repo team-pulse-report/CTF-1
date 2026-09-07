@@ -46,8 +46,7 @@ Defaults	use_pty
 # User privilege specification
 root	ALL=(ALL:ALL) ALL
 rebeca ALL=(ALL:ALL) NOPASSWD: /usr/bin/nano
-rebeca ALL=(ALL:ALL) NOPASSWD: /usr/bin/sudo -l
- 
+
 # Members of the admin group may gain root privileges
 %admin ALL=(ALL) ALL
 

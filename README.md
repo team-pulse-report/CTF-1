@@ -55,6 +55,10 @@ side of each `-p` flag (for example `-p 18080:8080 -p 2222:22 -p 2323:23
 - The intended solution path is documented, for maintainers, in
   `docs/WALKTHROUGH.md`. It is a spoiler; do not open it if you want to play.
 
+Note for maintainers and secret scanners: `docker-web/.ssh.tar` intentionally
+contains a disposable challenge SSH keypair (part of the gameplay), not a leaked
+credential.
+
 ## Credits
 
 This project is a maintained fork of the original Docker-in-Docker CTF by ilolm

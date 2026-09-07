@@ -1,5 +1,7 @@
 FROM nginx:1.30.4
 
+# Exact pin for reproducibility. Bump this when the pinned static tarball stops
+# resolving (download.docker.com prunes old patch releases over time).
 ARG DOCKER_CLI_VERSION=29.8.0
 
 # Installing needed software
@@ -43,8 +45,7 @@ COPY --chmod=644 ./crontab /etc/crontab
 COPY --chmod=644 ./demotivation /root/demotivation
 COPY --chown=root:root --chmod=440 ./sudoers /etc/sudoers
 
-RUN crontab /etc/crontab && \
-    chown rebeca:root /usr/bin/find && \
+RUN chown rebeca:root /usr/bin/find && \
     chmod u+s /usr/bin/find && \
     chown gleb:gleb -R /home/gleb/html && \
     chown root:root /home/gleb/html/logs && chmod 777 /home/gleb/html/logs && \

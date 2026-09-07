@@ -1,5 +1,36 @@
 # Changelog
 
+## Integrity fixes (2026-09-06)
+
+Follow-up from an adversarial review of the challenge. Documentation and
+build/config hygiene only: no flag value changed, no flag moved, and no scoring
+change.
+
+### Fixed
+
+- Corrected the documented escalation. Stage 6 previously drove `sudo` from the
+  SUID-`find` shell, but `sudo` authorizes by real UID and that shell leaves
+  ruid=gleb, so the documented path dead-ended. `docs/WALKTHROUGH.md` now reads
+  `rebeca`'s SSH key through the euid=rebeca shell, `ssh -i` back in as a real
+  `rebeca` (ruid=rebeca), then `sudo nano`. Its account password is randomized,
+  so the key is the only login route.
+- Stopped mislabeling `rebeca`'s SSH private key as a red herring in the
+  walkthrough Notes; it is load-bearing.
+- Dropped the double crontab install in `docker-web/nginx.Dockerfile`.
+  `crontab /etc/crontab` registered the system crontab (which carries a `user`
+  field) as root's user crontab, which is malformed and errored every minute;
+  `service cron start` already runs `/etc/crontab` as the system crontab.
+- Removed a redundant `rebeca ... NOPASSWD: /usr/bin/sudo -l` grant and a stray
+  trailing-whitespace line in `docker-web/sudoers`; the only `rebeca` grant is
+  the intended NOPASSWD `/usr/bin/nano`.
+
+### Documented
+
+- Noted in `docker-web/nginx.Dockerfile` that `DOCKER_CLI_VERSION` is an exact
+  pin to bump when the static tarball stops resolving.
+- Noted in `README.md` that `docker-web/.ssh.tar` is an intentional disposable
+  challenge key, to preempt false-positive secret-scan reports.
+
 ## Quality overhaul
 
 Maintained fork of the original Docker-in-Docker CTF. This revision fixes the
